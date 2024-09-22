@@ -2,11 +2,10 @@
 pragma solidity ^0.8.24;
 
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
-import {IVRFCoordinatorV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
-error Raffle__NotEnoughETHEntered();
+error Raffle__NotEnoughETHSent();
 error Raffle__TransferFailed();
 error Raffle__NotOpen();
 error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
@@ -24,7 +23,6 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
     /* state variables */
     uint256 private immutable i_entranceFee;
     address payable[] private s_players;
-    IVRFCoordinatorV2Plus private immutable i_vrfCoordinator;
     bytes32 private immutable i_keyHash;
     uint256 private immutable i_subscriptionId;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
@@ -53,7 +51,6 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         uint256 interval
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
         i_entranceFee = entranceFee;
-        i_vrfCoordinator = IVRFCoordinatorV2Plus(vrfCoordinator);
         i_keyHash = keyHash;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
@@ -69,7 +66,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
         }
 
         if (msg.value < i_entranceFee) {
-            revert Raffle__NotEnoughETHEntered();
+            revert Raffle__NotEnoughETHSent();
         }
 
         s_players.push(payable(msg.sender));
@@ -110,7 +107,7 @@ contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
 
         s_raffleState = RaffleState.CALCULATING;
 
-        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
                 keyHash: i_keyHash,
                 subId: i_subscriptionId,
