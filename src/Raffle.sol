@@ -5,16 +5,16 @@ import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFCo
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
-error Raffle__NotEnoughETHSent();
-error Raffle__TransferFailed();
-error Raffle__NotOpen();
-error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
-
 /**
  * @title a sample raffle contract
  * @author BTBMan
  */
 contract Raffle is VRFConsumerBaseV2Plus, AutomationCompatibleInterface {
+    error Raffle__NotEnoughETHSent();
+    error Raffle__TransferFailed();
+    error Raffle__NotOpen();
+    error Raffle__UpkeepNotNeeded(uint256 currentBalance, uint256 numPlayers, uint256 raffleState);
+
     enum RaffleState {
         OPEN,
         CALCULATING

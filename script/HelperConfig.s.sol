@@ -6,6 +6,7 @@ import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VR
 
 contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
+
     uint96 public constant BASE_FEE = 0.2 ether;
     uint96 public constant GAS_PRICE = 1000000000;
     int256 public constant WEI_PER_UNIT_LINK = 4410411539125376;

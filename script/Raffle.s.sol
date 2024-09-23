@@ -8,7 +8,8 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 contract RaffleScript is Script {
     function setUp() public {}
 
-    function run() public returns (Raffle) {
+    function run() public returns (Raffle, HelperConfig) {
+        HelperConfig helpConfig = new HelperConfig();
         (
             address vrfCoordinator,
             uint256 entranceFee,
@@ -17,7 +18,7 @@ contract RaffleScript is Script {
             uint32 callbackGasLimit,
             bool enableNativePayment,
             uint256 interval
-        ) = new HelperConfig().activeNetworkConfig();
+        ) = helpConfig.activeNetworkConfig();
 
         vm.startBroadcast();
         Raffle raffle = new Raffle(
@@ -25,6 +26,6 @@ contract RaffleScript is Script {
         );
         vm.stopBroadcast();
 
-        return raffle;
+        return (raffle, helpConfig);
     }
 }
