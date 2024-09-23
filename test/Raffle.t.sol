@@ -58,4 +58,17 @@ contract RaffleTest is Test {
         emit RaffleEnter(user);
         raffle.enterRaffle{value: entranceFee}();
     }
+
+    function testCantEnterWhenRaffleIsCalculating() public prank {
+        raffle.enterRaffle{value: entranceFee}();
+
+        vm.warp(block.timestamp + interval + 1); // increase the block time
+        vm.roll(block.number + 1); // add a block
+
+        raffle.performUpkeep("");
+
+        vm.expectRevert(Raffle.Raffle__NotOpen.selector);
+
+        raffle.enterRaffle{value: entranceFee}();
+    }
 }

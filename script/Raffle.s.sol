@@ -4,6 +4,7 @@ pragma solidity ^0.8.27;
 import {Script, console} from "forge-std/Script.sol";
 import {Raffle} from "../src/Raffle.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
+import {CreateSubscription} from "./Interactions.s.sol";
 
 contract RaffleScript is Script {
     function setUp() public {}
@@ -19,6 +20,13 @@ contract RaffleScript is Script {
             bool enableNativePayment,
             uint256 interval
         ) = helpConfig.activeNetworkConfig();
+
+        if (subscriptionId == 0) {
+            // need to create a subscription
+            subscriptionId = new CreateSubscription().createSubscription(vrfCoordinator);
+        }
+
+        console.log("subscriptionId is %s", subscriptionId);
 
         vm.startBroadcast();
         Raffle raffle = new Raffle(
