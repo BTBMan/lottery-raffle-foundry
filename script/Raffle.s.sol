@@ -4,7 +4,7 @@ pragma solidity ^0.8.27;
 import {Script, console} from "forge-std/Script.sol";
 import {Raffle} from "../src/Raffle.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
-import {CreateSubscription} from "./Interactions.s.sol";
+import {CreateSubscription, FundSubscription, AddConsumer} from "./Interactions.s.sol";
 
 contract RaffleScript is Script {
     function setUp() public {}
@@ -24,15 +24,19 @@ contract RaffleScript is Script {
         if (subscriptionId == 0) {
             // need to create a subscription
             subscriptionId = new CreateSubscription().createSubscription(vrfCoordinator);
-        }
 
-        console.log("subscriptionId is %s", subscriptionId);
+            // fund it
+            new FundSubscription().fundSubscription(vrfCoordinator, subscriptionId);
+        }
 
         vm.startBroadcast();
         Raffle raffle = new Raffle(
             vrfCoordinator, entranceFee, keyHash, subscriptionId, callbackGasLimit, enableNativePayment, interval
         );
         vm.stopBroadcast();
+
+        // add consumer
+        new AddConsumer().addConsumer(address(raffle), vrfCoordinator, subscriptionId);
 
         return (raffle, helpConfig);
     }

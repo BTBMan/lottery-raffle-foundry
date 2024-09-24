@@ -26,3 +26,23 @@ contract CreateSubscription is Script {
         return createSubscriptionUsingConfig();
     }
 }
+
+contract FundSubscription is Script {
+    function fundSubscription(address vrfCoordinator, uint256 subId) public {
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subId, 1e18);
+        vm.stopBroadcast();
+    }
+
+    function run() public {}
+}
+
+contract AddConsumer is Script {
+    function addConsumer(address raffle, address vrfCoordinator, uint256 subId) public {
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(subId, raffle);
+        vm.stopBroadcast();
+    }
+
+    function run() public {}
+}
