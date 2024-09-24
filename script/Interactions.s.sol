@@ -30,7 +30,7 @@ contract CreateSubscription is Script {
 contract FundSubscription is Script {
     function fundSubscription(address vrfCoordinator, uint256 subId) public {
         vm.startBroadcast();
-        VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subId, 1e18);
+        VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subId, 100 ether);
         vm.stopBroadcast();
     }
 

@@ -137,4 +137,39 @@ contract RaffleTest is Test {
 
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(randomRequestId, address(raffle));
     }
+
+    function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public prank {
+        raffle.enterRaffle{value: entranceFee}();
+
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+
+        uint256 additionalEntrants = 5;
+        uint256 stringIndex = 1;
+        for (uint256 index = stringIndex; index < additionalEntrants + stringIndex; index++) {
+            hoax(address(uint160(index)), STARTING_BALANCE);
+
+            raffle.enterRaffle{value: entranceFee}();
+        }
+
+        uint256 prize = entranceFee * (additionalEntrants + 1);
+
+        vm.recordLogs();
+
+        raffle.performUpkeep("");
+
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+        bytes32 requestId = entries[1].topics[1];
+
+        uint256 previousTimestamp = raffle.getLatestTimeStamp();
+
+        // pretend to be chainlink vrf to get random number and pick winner
+        VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(uint256(requestId), address(raffle));
+
+        assert(uint256(raffle.getRaffleState()) == 0);
+        assert(raffle.getRecentWinner() != address(0));
+        assert(raffle.getNumberOfPlayers() == 0);
+        assert(previousTimestamp < raffle.getLatestTimeStamp());
+        assert(raffle.getRecentWinner().balance == STARTING_BALANCE + prize - entranceFee);
+    }
 }
