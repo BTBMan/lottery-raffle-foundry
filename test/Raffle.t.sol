@@ -3,6 +3,7 @@ pragma solidity ^0.8.27;
 
 import {Test, console} from "forge-std/Test.sol";
 import {Vm} from "forge-std/Vm.sol";
+import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {Raffle} from "../src/Raffle.sol";
 import {RaffleScript} from "../script/Raffle.s.sol";
 import {HelperConfig} from "../script/HelperConfig.s.sol";
@@ -124,5 +125,16 @@ contract RaffleTest is Test {
 
         assert(uint256(requestId) > 0);
         assertEq(uint256(raffle.getRaffleState()), 1);
+    }
+
+    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public prank {
+        raffle.enterRaffle{value: entranceFee}();
+
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+
+        vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
+
+        VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(randomRequestId, address(raffle));
     }
 }
