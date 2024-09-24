@@ -2,6 +2,7 @@
 pragma solidity ^0.8.27;
 
 import {Test, console} from "forge-std/Test.sol";
+import {Vm} from "forge-std/Vm.sol";
 import {Raffle} from "../src/Raffle.sol";
 import {RaffleScript} from "../script/Raffle.s.sol";
 import {HelperConfig} from "../script/HelperConfig.s.sol";
@@ -106,5 +107,22 @@ contract RaffleTest is Test {
     function testPerformUpkeepRevertIfCheckUpkeepIsFalse() public prank {
         vm.expectRevert(abi.encodeWithSelector(Raffle.Raffle__UpkeepNotNeeded.selector, 0, 0, 0));
         raffle.performUpkeep("");
+    }
+
+    function testPerformUpkeepUpdatesRaffleStateAndEmitsRequestId() public prank {
+        raffle.enterRaffle{value: entranceFee}();
+
+        vm.warp(block.timestamp + interval + 1);
+        vm.roll(block.number + 1);
+
+        vm.recordLogs();
+
+        raffle.performUpkeep("");
+
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+        bytes32 requestId = entries[1].topics[1];
+
+        assert(uint256(requestId) > 0);
+        assertEq(uint256(raffle.getRaffleState()), 1);
     }
 }
