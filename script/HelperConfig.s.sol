@@ -19,6 +19,7 @@ contract HelperConfig is Script {
         uint32 callbackGasLimit;
         bool enableNativePayment;
         uint256 interval;
+        uint256 deployerKey;
     }
 
     constructor() {
@@ -29,7 +30,7 @@ contract HelperConfig is Script {
         }
     }
 
-    function getSepoliaEthConfig() public pure returns (NetworkConfig memory) {
+    function getSepoliaEthConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory config = NetworkConfig({
             vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
             entranceFee: 0.01 ether,
@@ -37,7 +38,8 @@ contract HelperConfig is Script {
             subscriptionId: 8413420575713347438279475371557282730552385308244088423147202136625497173362,
             callbackGasLimit: 500000,
             enableNativePayment: false,
-            interval: 30
+            interval: 30,
+            deployerKey: vm.envUint("REAL_PRIVATE_KEY")
         });
 
         return config;
@@ -59,7 +61,8 @@ contract HelperConfig is Script {
             subscriptionId: 0,
             callbackGasLimit: 500000,
             enableNativePayment: false,
-            interval: 30
+            interval: 30,
+            deployerKey: vm.envUint("PRIVATE_KEY")
         });
 
         return config;

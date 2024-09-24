@@ -9,13 +9,13 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256) {
         HelperConfig helpConfig = new HelperConfig();
-        (address vrfCoordinator,,,,,,) = helpConfig.activeNetworkConfig();
+        (address vrfCoordinator,,,,,,, uint256 deployerKey) = helpConfig.activeNetworkConfig();
 
-        return createSubscription(vrfCoordinator);
+        return createSubscription(vrfCoordinator, deployerKey);
     }
 
-    function createSubscription(address vrfCoordinator) public returns (uint256) {
-        vm.startBroadcast();
+    function createSubscription(address vrfCoordinator, uint256 deployerKey) public returns (uint256) {
+        vm.startBroadcast(deployerKey);
         uint256 subscriptionId = VRFCoordinatorV2_5Mock(vrfCoordinator).createSubscription();
         vm.stopBroadcast();
 
@@ -28,8 +28,8 @@ contract CreateSubscription is Script {
 }
 
 contract FundSubscription is Script {
-    function fundSubscription(address vrfCoordinator, uint256 subId) public {
-        vm.startBroadcast();
+    function fundSubscription(address vrfCoordinator, uint256 subId, uint256 deployerKey) public {
+        vm.startBroadcast(deployerKey);
         VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subId, 100 ether);
         vm.stopBroadcast();
     }
@@ -38,8 +38,8 @@ contract FundSubscription is Script {
 }
 
 contract AddConsumer is Script {
-    function addConsumer(address raffle, address vrfCoordinator, uint256 subId) public {
-        vm.startBroadcast();
+    function addConsumer(address raffle, address vrfCoordinator, uint256 subId, uint256 deployerKey) public {
+        vm.startBroadcast(deployerKey);
         VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(subId, raffle);
         vm.stopBroadcast();
     }

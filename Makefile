@@ -9,3 +9,6 @@ deploy-local:
 
 deploy-sepolia:
 	forge script script/Raffle.s.sol --rpc-url $(SEPOLIA_RPC_URL) --private-key $(REAL_PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY)
+
+test-sepolia-fork:
+	forge test --fork-url $(SEPOLIA_RPC_URL)

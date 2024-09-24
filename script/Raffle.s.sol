@@ -18,25 +18,26 @@ contract RaffleScript is Script {
             uint256 subscriptionId,
             uint32 callbackGasLimit,
             bool enableNativePayment,
-            uint256 interval
+            uint256 interval,
+            uint256 deployerKey
         ) = helpConfig.activeNetworkConfig();
 
         if (subscriptionId == 0) {
             // need to create a subscription
-            subscriptionId = new CreateSubscription().createSubscription(vrfCoordinator);
+            subscriptionId = new CreateSubscription().createSubscription(vrfCoordinator, deployerKey);
 
             // fund it
-            new FundSubscription().fundSubscription(vrfCoordinator, subscriptionId);
+            new FundSubscription().fundSubscription(vrfCoordinator, subscriptionId, deployerKey);
         }
 
-        vm.startBroadcast();
+        vm.startBroadcast(deployerKey);
         Raffle raffle = new Raffle(
             vrfCoordinator, entranceFee, keyHash, subscriptionId, callbackGasLimit, enableNativePayment, interval
         );
         vm.stopBroadcast();
 
         // add consumer
-        new AddConsumer().addConsumer(address(raffle), vrfCoordinator, subscriptionId);
+        new AddConsumer().addConsumer(address(raffle), vrfCoordinator, subscriptionId, deployerKey);
 
         return (raffle, helpConfig);
     }
