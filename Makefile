@@ -20,4 +20,7 @@ t:; forge test
 t-sepolia:
 	@forge test --fork-url $(SEPOLIA_RPC_URL)
 
-mine:; cast rpc evm_mine --rpc-url $(RPC_URL)
+mine:; @cast rpc evm_mine --rpc-url $(RPC_URL)
+
+recent-winner:
+	@cast call 0x69142f9c95f2af85c02516ecaba3051d4facdaaf "getRecentWinner()" --rpc-url $(SEPOLIA_RPC_URL)
