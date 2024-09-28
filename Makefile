@@ -19,3 +19,5 @@ t:; forge test
 
 t-sepolia:
 	@forge test --fork-url $(SEPOLIA_RPC_URL)
+
+mine:; cast rpc evm_mine --rpc-url $(RPC_URL)
