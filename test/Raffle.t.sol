@@ -45,11 +45,11 @@ contract RaffleTest is Test {
     }
 
     // tests
-    function testRaffleInitiallizesInOpenState() public view {
+    function testRaffleInitializesInOpenState() public view {
         assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN);
     }
 
-    function testRaffleRevertsWhenYouDontPayEnouth() public prank {
+    function testRaffleRevertsWhenYouDontPayEnough() public prank {
         vm.expectRevert(Raffle.Raffle__NotEnoughETHSent.selector);
 
         raffle.enterRaffle();
